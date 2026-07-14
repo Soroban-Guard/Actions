@@ -8,6 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: your-org/soroban-guard-action@v1
+      - uses: Soroban-Guard/Actions@v1
         with:
           path: ${{ matrix.contract-path }}

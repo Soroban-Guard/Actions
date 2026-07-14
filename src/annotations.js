@@ -1,10 +1,10 @@
 const core = require('@actions/core');
 const fs = require('fs');
 
-function createAnnotations() {
-  const resultsPath = process.env.RESULTS_PATH || '/tmp/soroban-guard-results.json';
-  const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
+function createAnnotations(resultsPath) {
+  if (!fs.existsSync(resultsPath)) return;
 
+  const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
   if (!results.findings) return;
 
   for (const finding of results.findings) {
@@ -30,4 +30,4 @@ function createAnnotations() {
   }
 }
 
-createAnnotations();
+module.exports = { createAnnotations };

@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: your-org/soroban-guard-action@v1
+      - uses: Soroban-Guard/Actions@v1
         id: guard
         with:
           path: contracts/

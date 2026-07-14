@@ -1,6 +1,6 @@
 name: 'Soroban Guard'
 description: 'Static analysis and security auditing for Soroban smart contracts'
-author: 'Your Org'
+author: 'Soroban Guard'
 branding:
   icon: 'shield'
   color: 'blue'
@@ -29,7 +29,7 @@ inputs:
   token:
     description: 'GitHub token for PR comments and code scanning'
     required: false
-    default: ${{ github.token }}
+    default: ''
   fail_on:
     description: 'Severity level that causes workflow failure (critical, high, medium, low)'
     required: false
@@ -44,3 +44,7 @@ outputs:
     description: 'Number of high findings'
   report_path:
     description: 'Path to the generated SARIF report'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
