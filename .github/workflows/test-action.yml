@@ -1,0 +1,17 @@
+name: Test Soroban Guard Action
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Soroban Guard
+        id: guard
+        uses: ./soroban-guard-action
+        with:
+          path: tests/fixtures/contracts/
+          format: json
+      - name: Check results
+        run: |
+          echo "Score: ${{ steps.guard.outputs.score }}"
+          echo "Critical: ${{ steps.guard.outputs.critical_count }}"

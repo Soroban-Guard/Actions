@@ -1,0 +1,46 @@
+name: 'Soroban Guard'
+description: 'Static analysis and security auditing for Soroban smart contracts'
+author: 'Your Org'
+branding:
+  icon: 'shield'
+  color: 'blue'
+
+inputs:
+  path:
+    description: 'Path(s) to Soroban contract source files or directories'
+    required: true
+    default: '.'
+  format:
+    description: 'Output format (human, json, sarif)'
+    required: false
+    default: 'sarif'
+  min_severity:
+    description: 'Minimum severity to fail (critical, high, medium, low, info)'
+    required: false
+    default: 'high'
+  exclude:
+    description: 'Comma-separated glob patterns to exclude'
+    required: false
+    default: ''
+  upload_sarif:
+    description: 'Upload SARIF results to GitHub code scanning'
+    required: false
+    default: 'true'
+  token:
+    description: 'GitHub token for PR comments and code scanning'
+    required: false
+    default: ${{ github.token }}
+  fail_on:
+    description: 'Severity level that causes workflow failure (critical, high, medium, low)'
+    required: false
+    default: 'high'
+
+outputs:
+  score:
+    description: 'Overall security score (0-100)'
+  critical_count:
+    description: 'Number of critical findings'
+  high_count:
+    description: 'Number of high findings'
+  report_path:
+    description: 'Path to the generated SARIF report'

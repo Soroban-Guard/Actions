@@ -1,0 +1,16 @@
+{
+  "name": "soroban-guard-action",
+  "version": "1.0.0",
+  "description": "GitHub Action for Soroban Guard security analysis",
+  "main": "src/main.js",
+  "scripts": {
+    "post-pr-comment": "node src/post-pr-comment.js",
+    "annotations": "node src/annotations.js"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/github": "^6.0.0"
+  },
+  "license": "MIT"
+}
