@@ -1,0 +1,26 @@
+name: Pre-commit Security Scan
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  precommit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: your-org/soroban-guard-action@v1
+        id: guard
+        with:
+          path: contracts/
+          format: json
+          fail_on: critical
+
+      - name: Post summary
+        if: always()
+        run: |
+          echo "## Soroban Guard Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Score**: ${{ steps.guard.outputs.score }}/100" >> $GITHUB_STEP_SUMMARY
+          echo "- **Critical**: ${{ steps.guard.outputs.critical_count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **High**: ${{ steps.guard.outputs.high_count }}" >> $GITHUB_STEP_SUMMARY

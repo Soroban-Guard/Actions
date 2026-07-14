@@ -1,28 +1,27 @@
-name: Soroban Guard Full
-on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
-
+name: Security Audit
+on: [pull_request, push]
 jobs:
-  security:
+  audit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: your-org/soroban-guard-action@v1
         id: guard
         with:
-          path: contracts/
+          path: |
+            contracts/
+            src/
+          exclude: '**/test_*,**/fixtures/*'
           format: sarif
           min_severity: medium
-          exclude: "**/test/**,**/mock/**"
-          upload_sarif: 'true'
-          fail_on: critical
+          fail_on: high
+          upload_sarif: true
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload SARIF to Code Scanning
-        if: always()
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: ${{ steps.guard.outputs.report_path }}
+      - name: Check score
+        run: |
+          echo "Security score: ${{ steps.guard.outputs.score }}"
+          if [[ "${{ steps.guard.outputs.score }}" -lt 70 ]]; then
+            echo "Score below threshold!"
+            exit 1
+          fi

@@ -1,0 +1,10 @@
+{
+  "name": "Soroban Guard",
+  "description": "Static analysis and security auditing for Soroban smart contracts. Detects reentrancy, overflow, access control flaws, and storage collisions.",
+  "categories": [
+    "code-review",
+    "security",
+    "static-analysis"
+  ],
+  "labels": ["soroban", "stellar", "smart-contracts", "security", "rust"]
+}

@@ -2,9 +2,12 @@ name: Security Audit
 on: [pull_request]
 jobs:
   audit:
+    strategy:
+      matrix:
+        contract-path: [contracts/vault, contracts/nft, contracts/amm]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: your-org/soroban-guard-action@v1
         with:
-          path: contracts/
+          path: ${{ matrix.contract-path }}
