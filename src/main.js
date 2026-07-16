@@ -40,16 +40,15 @@ async function run() {
     const exclude = core.getInput('exclude') || '';
     const failOn = core.getInput('fail_on') || 'high';
     const token = core.getInput('token') || process.env.GITHUB_TOKEN || '';
-    const uploadSarifFlag = core.getInput('upload_sarif') || 'true';
+    const uploadSarifFlag = core.getBooleanInput('upload_sarif');
 
-    const args = [];
+    const ext = format === 'sarif' ? '.sarif' : '.json';
+    const resultsPath = `/tmp/soroban-guard-results${ext}`;
+
+    const args = ['--min-severity', minSeverity, '--format', format, '--output', resultsPath];
     if (exclude) args.push('--exclude', exclude);
-    args.push('--min-severity', minSeverity);
-    args.push('--format', format);
-    const resultsPath = '/tmp/soroban-guard-results.json';
-    args.push('--output', resultsPath);
 
-    console.log(`Running Soroban Guard on ${inputPath}...`);
+    core.info(`Running Soroban Guard on ${inputPath}...`);
     const exitCode = await exec('soroban-guard', [inputPath, ...args], { ignoreReturnCode: true });
 
     if (!fs.existsSync(resultsPath)) {
@@ -75,16 +74,9 @@ async function run() {
       await postComment(octokit, results);
     }
 
-    if (octokit && uploadSarifFlag === 'true' && format === 'sarif') {
+    if (octokit && uploadSarifFlag && format === 'sarif') {
       const { owner, repo } = github.context.repo;
-      await uploadSarif(
-        octokit,
-        owner,
-        repo,
-        resultsPath,
-        github.context.sha,
-        github.context.ref
-      );
+      await uploadSarif(octokit, owner, repo, resultsPath, github.context.sha, github.context.ref);
     }
 
     if (shouldFail(failOn, findings)) {

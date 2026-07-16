@@ -1,5 +1,13 @@
 const { formatComment } = require('./post-pr-comment');
 
+function assert(condition, message) {
+  if (!condition) {
+    console.error(`  [FAIL] ${message}`);
+    process.exit(1);
+  }
+  console.log(`  [PASS] ${message}`);
+}
+
 function testFormatComment() {
   const results = {
     score: 72,
@@ -16,22 +24,12 @@ function testFormatComment() {
 
   const comment = formatComment(results);
 
-  const checks = [
-    { name: 'contains score', pass: comment.includes('72/100') },
-    { name: 'contains critical count', pass: comment.includes('Critical') },
-    { name: 'contains finding info', pass: comment.includes('R-01') },
-    { name: 'contains reentrancy message', pass: comment.includes('Reentrancy') },
-  ];
+  assert(comment.includes('72/100'), 'includes score');
+  assert(comment.includes('Critical'), 'includes critical count');
+  assert(comment.includes('R-01'), 'includes finding rule ID');
+  assert(comment.includes('Reentrancy'), 'includes finding message');
 
-  let allPassed = true;
-  for (const check of checks) {
-    const status = check.pass ? 'PASS' : 'FAIL';
-    if (!check.pass) allPassed = false;
-    console.log(`  [${status}] ${check.name}`);
-  }
-
-  console.log(`\n${allPassed ? 'All tests passed' : 'Some tests failed'}`);
-  process.exit(allPassed ? 0 : 1);
+  console.log('\nAll tests passed');
 }
 
 testFormatComment();

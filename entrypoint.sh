@@ -1,4 +1,4 @@
 #!/bin/bash
-set -eu
+set -euo pipefail
 
-node /action/src/main.js
+exec node /action/src/main.js

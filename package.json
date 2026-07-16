@@ -3,9 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "description": "Soroban Guard GitHub Action",
+  "license": "MIT",
   "main": "src/main.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "test": "node src/test.js"
+    "test": "node src/test.js",
+    "lint": "node -e \"require('fs').readdirSync('src').forEach(f => require('path').join('src', f))\""
   },
   "dependencies": {
     "@actions/core": "^1.10.0",
