@@ -10,7 +10,7 @@
   },
   "scripts": {
     "test": "node src/test.js",
-    "lint": "node -e \"require('fs').readdirSync('src').forEach(f => require('path').join('src', f))\""
+    "lint": "node scripts/lint.js"
   },
   "dependencies": {
     "@actions/core": "^1.10.0",

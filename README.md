@@ -181,12 +181,12 @@ Score-based gating can be added as a post-step:
 | Input | Required | Default | Description |
 |-------|----------|---------|-------------|
 | `path` | Yes | `.` | Path(s) to Soroban contract source files or directories. Supports newline-separated list for multiple paths. |
-| `format` | No | `sarif` | Output format: `human`, `json`, or `sarif`. |
-| `min_severity` | No | `high` | Minimum severity to report: `critical`, `high`, `medium`, `low`, `info`. Findings below this threshold are omitted. |
+| `format` | No | `sarif` | Output format for `report_path`: `human`, `json`, or `sarif`. `sarif` is uploaded to code scanning when `upload_sarif` is enabled. |
+| `min_severity` | No | `high` | Minimum severity to report: `critical`, `high`, `medium`, `low`, `info`. Findings below this threshold are omitted from annotations and comments. |
 | `exclude` | No | `''` | Comma-separated glob patterns of files to skip (e.g. `**/test_*,**/fixtures/*`). |
 | `upload_sarif` | No | `true` | Upload SARIF results to GitHub code scanning. |
 | `token` | No | `github.token` | GitHub token for SARIF upload and PR comment posting. |
-| `fail_on` | No | `high` | Severity level that causes the action to fail: `critical`, `high`, `medium`, `low`. |
+| `fail_on` | No | `high` | Severity level that causes the action to fail: `critical`, `high`, `medium`, `low`. Independent of `min_severity`. |
 
 ## Outputs
 
@@ -201,12 +201,14 @@ Score-based gating can be added as a post-step:
 
 Soroban Guard is a Docker-based action built in two stages:
 
-1. **Builder stage** — clones [Soroban-Guard/Core](https://github.com/Soroban-Guard/Core) and compiles the Rust static analyzer with `cargo build --release`.
-2. **Runtime stage** — copies the compiled binary into a `node:20-slim` image alongside the Node.js orchestrator (`src/main.js`).
-
-At runtime, `entrypoint.sh` invokes `node src/main.js`, which handles all logic: running the analyzer against the specified paths, parsing results, setting outputs, posting PR comments, creating inline annotations, and uploading SARIF artifacts.
+1. **Builder stage** — installs the published [`soroban-guard-core`](https://crates.io/crates/soroban-guard-core) crate (v0.1.0) and copies the compiled Rust analyzer binary into a `node:20-slim` image alongside the Node.js orchestrator (`src/main.js`).
+2. **Runtime stage** — `entrypoint.sh` invokes `node src/main.js`, which runs the analyzer in JSON mode to compute the score and findings, sets outputs, posts PR comments, creates inline annotations, generates a SARIF artifact for code scanning, and enforces the `fail_on` threshold.
 
 The Node.js layer uses `@actions/core`, `@actions/exec`, and `@actions/github` for all GitHub API interactions.
+
+### Test fixtures
+
+The `fixtures/` directory contains sample Soroban contracts used by the test suite and CI: vulnerable contracts (`token`, `amm_pair`, `escrow`) that should produce findings, and a secure baseline (`vault`) that should pass. See [fixtures/README.md](fixtures/README.md).
 
 ## Project ecosystem
 
@@ -250,13 +252,10 @@ Annotations appear directly in the Files changed tab of a pull request.
 
 ## Contributing
 
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feat/my-change`).
-3. Install dependencies: `npm install`.
-4. Make changes and verify with `node src/test.js`.
-5. Commit and open a pull request.
-
-Source files for the action logic are in `src/`. The Rust analyzer source is maintained in the [Soroban-Guard/Core](https://github.com/Soroban-Guard/Core) repository.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, style, and testing guidance.
+Source files for the action logic are in `src/`. The Rust analyzer source is
+maintained in the [Soroban-Guard/Core](https://github.com/Soroban-Guard/Core)
+repository.
 
 ## License
 

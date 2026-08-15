@@ -1,11 +1,63 @@
 name: Test Soroban Guard Action
-on: [push]
+on:
+  push:
+    branches: [main]
+  pull_request:
+
 jobs:
-  test:
+  unit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: npm install
+      - name: Lint
+        run: npm run lint
       - name: Run unit tests
         run: node src/test.js
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build action image
+        run: docker build -t soroban-guard-action .
+      - name: Scan vulnerable fixtures (expect failure)
+        run: |
+          set +e
+          docker run --rm \
+            -e INPUT_PATH=/github/workspace/fixtures/vulnerable \
+            -e INPUT_FORMAT=json \
+            -e INPUT_MIN_SEVERITY=info \
+            -e INPUT_UPLOAD_SARIF=false \
+            -e INPUT_FAIL_ON=high \
+            -v "$PWD":/github/workspace \
+            soroban-guard-action > /tmp/vulnerable.log 2>&1
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then
+            echo "Expected non-zero exit when high-severity findings exist"
+            cat /tmp/vulnerable.log
+            exit 1
+          fi
+          grep -q "Soroban Guard found" /tmp/vulnerable.log
+          grep -q "R-01" /tmp/vulnerable.log
+      - name: Scan secure baseline (expect pass)
+        run: |
+          set +e
+          docker run --rm \
+            -e INPUT_PATH=/github/workspace/fixtures/secure \
+            -e INPUT_FORMAT=json \
+            -e INPUT_MIN_SEVERITY=info \
+            -e INPUT_UPLOAD_SARIF=false \
+            -e INPUT_FAIL_ON=high \
+            -v "$PWD":/github/workspace \
+            soroban-guard-action > /tmp/secure.log 2>&1
+          code=$?
+          set -e
+          if [ "$code" -ne 0 ]; then
+            echo "Expected clean exit for secure baseline"
+            cat /tmp/secure.log
+            exit 1
+          fi
+          grep -q "score" /tmp/secure.log

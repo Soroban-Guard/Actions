@@ -1,28 +1,32 @@
 const github = require('@actions/github');
 
+function gradeFor(score) {
+  if (typeof score !== 'number' || Number.isNaN(score)) return 'N/A';
+  return score >= 90 ? 'A' : score >= 70 ? 'B' : score >= 50 ? 'C' : 'D';
+}
+
 function formatComment(results) {
-  const score = results.score || results.overall || 'N/A';
-  const grade = score >= 90 ? 'A' : score >= 70 ? 'B' : score >= 50 ? 'C' : 'D';
+  const score = typeof results.score === 'number' ? results.score : 'N/A';
+  const grade = gradeFor(results.score);
+  const breakdown = results.breakdown || {};
 
   let body = `## Soroban Guard Report\n\n`;
   body += `| Metric | Value |\n`;
   body += `|--------|------:|\n`;
   body += `| **Score** | **${score}/100 (${grade})** |\n`;
+  body += `| Critical | ${breakdown.critical ?? 0} |\n`;
+  body += `| High | ${breakdown.high ?? 0} |\n`;
+  body += `| Medium | ${breakdown.medium ?? 0} |\n`;
+  body += `| Low | ${breakdown.low ?? 0} |\n`;
 
-  if (results.breakdown) {
-    body += `| Critical | ${results.breakdown.critical} |\n`;
-    body += `| High | ${results.breakdown.high} |\n`;
-    body += `| Medium | ${results.breakdown.medium} |\n`;
-    body += `| Low | ${results.breakdown.low} |\n`;
-  }
-
-  if (results.findings && results.findings.length > 0) {
+  const findings = results.findings || [];
+  if (findings.length > 0) {
     body += `\n### Top Findings\n\n`;
     body += `| Rule | Severity | Message |\n`;
     body += `|------|----------|---------|\n`;
 
-    results.findings
-      .filter(f => ['critical', 'high'].includes(f.severity))
+    findings
+      .filter(f => ['critical', 'high'].includes(String(f.severity).toLowerCase()))
       .slice(0, 10)
       .forEach(f => {
         body += `| ${f.rule_id} | **${f.severity}** | ${f.message} |\n`;

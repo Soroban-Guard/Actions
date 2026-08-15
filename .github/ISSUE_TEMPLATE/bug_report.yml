@@ -1,0 +1,37 @@
+name: Bug report
+description: Report a bug in the Soroban Guard GitHub Action
+labels: [bug]
+body:
+  - type: textarea
+    id: describe
+    attributes:
+      label: Description
+      description: What happened and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal workflow YAML and inputs that trigger the bug.
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Observed output
+      description: Paste the action logs or the error message.
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Which release/tag did you use (e.g. v1)?
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have searched existing issues and this is not a duplicate.
+          required: true
