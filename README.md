@@ -220,6 +220,12 @@ Soroban Guard consists of three repositories that work together:
 | [Soroban-Guard/Core](https://github.com/Soroban-Guard/Core) | Rust static analyzer engine and CLI |
 | [Soroban-Guard/VS](https://github.com/Soroban-Guard/VS) | VS Code extension for inline analysis |
 
+**This action vs. the Core CLI:** this repository is the turnkey CI integration —
+it bundles the analyzer binary from [Core](https://github.com/Soroban-Guard/Core),
+so you never install Rust or wire up SARIF, comments, or annotations yourself.
+Use the Core CLI directly when you want to run scans from a terminal, a
+pre-commit hook, or a pipeline that doesn't use GitHub Actions.
+
 ## Severity levels
 
 | Level | Description |
