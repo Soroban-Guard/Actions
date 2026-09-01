@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN cargo install soroban-guard-core --version 0.1.0
 RUN cp /usr/local/cargo/bin/soroban-guard /usr/local/bin/soroban-guard
 
-FROM node:20-slim
+FROM node:26-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
   ca-certificates jq && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/local/bin/soroban-guard /usr/local/bin/soroban-guard
